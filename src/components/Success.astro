@@ -1,11 +1,12 @@
 ---
-import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import iconSuccessCheck from '../assets/images/icon-success-check.svg'
 ---
 
 <div id="success" class="fixed top-0 left-2/4 -translate-x-2/4 -translate-y-full p-6 max-w-[450px] bg-neutral-grey-900 rounded-xl transition-transform">
   <div class="text-primary-green-200 space-y-2">
     <div class="flex items-center gap-x-3">
-      <Icon class="size-5" name="icon-success-check" />
+      <Image class="size-5" src={iconSuccessCheck} alt="Check" />
       <h5 class="font-bold text-lg">Message Sent!</h5>
     </div>
     <div>
