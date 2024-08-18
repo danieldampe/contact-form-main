@@ -1,0 +1,14 @@
+---
+interface Props {
+  value: string
+}
+
+const { value } = Astro.props
+---
+
+<button
+  class="p-3.5 font-bold text-lg text-white rounded-lg bg-primary-green-600 hover:bg-neutral-grey-900"
+  type="submit"
+>
+  {value}
+</button>

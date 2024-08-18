@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Contact from '../components/Contact.astro'
+import Success from '../components/Success.astro'
+import Footer from '../components/Footer.astro'
+---
+
+<Layout title="Frontend Mentor | Contact form">
+  <main class="w-screen min-h-screen py-8 px-4 font-karla bg-primary-green-200 md:py-16 lg:py-32">
+    <Success />
+    <div class="max-w-[735px] p-6 mx-auto bg-neutral-white rounded-2xl md:p-10">
+      <Contact 
+        title="Contact Us"
+      />
+    </div>
+    <Footer />
+  </main>
+</Layout>

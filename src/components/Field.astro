@@ -1,0 +1,72 @@
+---
+type Props = {
+  label: string
+  name: string
+  type: 'text' | 'email' | 'textarea' | 'radio' | 'checkbox'
+  className?: string
+  values?: string[]
+}
+
+const { label, name, type, values, className } = Astro.props
+const id = type !== 'radio' ? crypto.randomUUID() : null
+const style = 'w-full p-3 border rounded-lg border-neutral-grey-500 text-lg text-neutral-grey-900 focus:outline-none focus:border-primary-green-600 data-[error=true]:border-primary-red'
+const attributes = { name, id }
+---
+
+<div class={`${className !== undefined ? className : ''} flex flex-col gap-y-2`} data-field={name}> 
+  {type === 'checkbox' 
+    ? (
+      <div class="flex items-center gap-x-5 px-1">
+        <input
+          class="size-5 accent-primary-green-600" 
+          name={name} 
+          type={type} 
+        />
+        <p class="text-neutral-grey-900">
+          {label}
+          <span class="text-primary-green-600">*</span>
+        </p>
+      </div>
+    ) 
+    : (
+      <div>
+        <label for={id}>
+          <span class="text-neutral-grey-900">{label}</span>
+          <span class="text-primary-green-600">*</span>
+        </label>
+      </div>
+      <div>
+        {type === 'textarea' 
+          ? (
+            <textarea 
+              {...attributes}
+              class={`h-64 resize-none md:h-44 lg:h-24 ${style}`}
+            />
+          ) 
+          : type === 'radio' && values !== undefined ? (
+            <div class="grid grid-cols-1 grid-rows-2 gap-4 mt-2 md:grid-cols-2 md:grid-rows-1">
+              {values.map((value) => {
+                return (
+                  <label class={`flex items-center gap-x-3 px-6 cursor-pointer [&:has(input:checked)]:bg-primary-green-200 [&:has(input:checked)]:border-primary-green-600 ${style}`}>
+                    <input 
+                      class="size-4 accent-primary-green-600"
+                      name={name}
+                      type={type} 
+                      value={value} 
+                    />
+                    <span>{value}</span>
+                  </label>
+                )
+              })}
+            </div>
+          ) : (
+            <input 
+              {...attributes}
+              class={style}
+              type={type} 
+            />
+          )}
+      </div>
+    )}
+  <span class="empty:hidden text-sm text-primary-red" data-id="message" />
+</div>

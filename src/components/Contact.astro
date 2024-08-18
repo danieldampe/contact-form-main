@@ -1,0 +1,140 @@
+---
+import Field from "./Field.astro"
+import Button from "./Button.astro"
+
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<form id="contact" class="w-full space-y-7" method="post">
+  <div>
+    <h1 class="font-bold text-3xl text-neutral-grey-900">{title}</h1>
+  </div>
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:grid-rows-[repeat(4,_min-content)] md:gap-y-5 md:gap-x-4">
+    <Field 
+      label='First Name' 
+      type='text' 
+      name='first_name' 
+    />
+    <Field 
+      label='Last Name' 
+      type='text' 
+      name='last_name' 
+    />
+    <Field 
+      className='md:col-span-2'
+      label='Email Address' 
+      type='text' 
+      name='email' 
+    />
+    <Field
+      className='md:col-span-2'
+      label='Query Type'
+      type='radio'
+      name='query_type'
+      values={['General Enquiry', 'Support Request']}
+    />
+    <Field 
+      className='md:col-span-2'
+      label='Message' 
+      type='textarea' 
+      name='message' 
+    />
+  </div>
+  <div class="flex flex-col gap-y-10">
+    <Field 
+      label="I consent to being contacted by the team"
+      type="checkbox"
+      name="consent"
+    />
+    <Button value='Submit' />
+  </div>
+</form>
+
+<script>
+  type Input = HTMLInputElement | HTMLTextAreaElement
+
+  const REGEXP = {
+    NAME: /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*$/,
+    EMAIL: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+  } as const
+
+  const ERROR_MESSAGE = {
+    NAME: 'Please enter a valid name',
+    EMAIL: 'Please enter a valid email address',
+    SUBMIT: 'To submit this form, please consent to being contacted',
+    QUERY_TYPE: 'Please select a query type'
+  } as const
+
+  const form = document.querySelector('#contact')
+
+  if (!(form instanceof HTMLFormElement)) throw new Error('There is not a form.')
+
+  const checkIsInput = (element: any): element is Input => element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+
+  const validateField = (input: Input): boolean => {
+    const formData = new FormData(form)
+    const { name, value, type } = input
+    const field = document.querySelector(`[data-field=${name}]`)
+    if (field === null) return false
+    const message = field.querySelector('[data-id=message]')
+    if (message === null) return false
+    let isValid = false
+
+    const show = (error: string) => {
+      isValid = false
+      input.dataset.error = 'true'
+      message.textContent = error
+    }
+
+    const hide = () => {
+      isValid = true
+      input.dataset.error = 'false'
+      message.textContent = ''
+    }
+
+    if (name === 'query_type' && !formData.has(name)) {
+      show(ERROR_MESSAGE.QUERY_TYPE)
+    } else if (value === '') {
+      show('This field is required')
+    } else if (input instanceof HTMLInputElement && type === 'checkbox' && input.checked === false) {
+      show(ERROR_MESSAGE.SUBMIT)
+    } else if ((name === 'first_name' || name === 'last_name') && !REGEXP.NAME.test(value)) {
+      show(ERROR_MESSAGE.NAME)
+    } else if (name === 'email' && !REGEXP.EMAIL.test(value)) {
+      show(ERROR_MESSAGE.EMAIL)
+    } else {
+      hide()
+    }
+
+    return isValid
+  }
+
+  form.addEventListener('input', (evt) => {
+    const { target } = evt
+    if (checkIsInput(target)) validateField(target)
+  })
+
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault()
+    const inputs = form.querySelectorAll('input, textarea')
+    const status: (boolean)[] = []
+    inputs.forEach(input => checkIsInput(input) && status.push(validateField(input)))
+    const isValid = !status.some(boo => boo === false)
+    if (isValid) {
+      form.reset()
+      const success = document.querySelector('#success')
+      if (success !== null) {
+        success.classList.remove('-translate-y-full')
+        success.classList.add('translate-y-6')
+        setTimeout(() => {
+          success.classList.add('-translate-y-full')
+          success.classList.toggle('translate-y-6')
+        }, 2500);
+      }
+    }
+  })
+</script>
